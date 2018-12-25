@@ -11,7 +11,7 @@ internal partial class Interop
 {
     internal partial class Kernel32
     {
-        [DllImport(Libraries.Kernel32, CharSet = CharSet.Ansi, BestFitMapping = false)]
+        [DllImport(Libraries.Kernel32, CharSet = CharSet.Ansi, BestFitMapping = false, SetLastError = true)]
         public static extern IntPtr GetProcAddress(SafeLibraryHandle hModule, string lpProcName);
 
         [DllImport(Libraries.Kernel32, CharSet = CharSet.Ansi, BestFitMapping = false)]

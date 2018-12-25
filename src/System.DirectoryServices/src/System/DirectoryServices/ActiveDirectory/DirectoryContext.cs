@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.Win32.SafeHandles;
 using System.Net;
 using System.Security.Principal;
 using System.Diagnostics;
@@ -9,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Security.Permissions;
 using System.IO;
+using CommonInterop = Interop;
 
 namespace System.DirectoryServices.ActiveDirectory
 {
@@ -32,8 +34,8 @@ namespace System.DirectoryServices.ActiveDirectory
         private bool _validated = false;
         private bool _contextIsValid = false;
 
-        internal static LoadLibrarySafeHandle ADHandle;
-        internal static LoadLibrarySafeHandle ADAMHandle;
+        internal static SafeLibraryHandle ADHandle;
+        internal static SafeLibraryHandle ADAMHandle;
 
         #region constructors
 
@@ -686,27 +688,27 @@ namespace System.DirectoryServices.ActiveDirectory
         {
             // first get AD handle
             string systemPath = Environment.SystemDirectory;
-            IntPtr tempHandle = UnsafeNativeMethods.LoadLibrary(systemPath + "\\ntdsapi.dll");
-            if (tempHandle == (IntPtr)0)
+            SafeLibraryHandle tempHandle = CommonInterop.Kernel32.LoadLibraryExW(systemPath + "\\ntdsapi.dll", IntPtr.Zero, 0);
+            if (tempHandle.IsInvalid)
             {
                 throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());
             }
             else
             {
-                ADHandle = new LoadLibrarySafeHandle(tempHandle);
+                ADHandle = tempHandle;
             }
 
             // not get the ADAM handle
             // got to the windows\adam directory
             DirectoryInfo windowsDirectory = Directory.GetParent(systemPath);
-            tempHandle = UnsafeNativeMethods.LoadLibrary(windowsDirectory.FullName + "\\ADAM\\ntdsapi.dll");
-            if (tempHandle == (IntPtr)0)
+            tempHandle = CommonInterop.Kernel32.LoadLibraryExW(windowsDirectory.FullName + "\\ADAM\\ntdsapi.dll", IntPtr.Zero, 0);
+            if (tempHandle.IsInvalid)
             {
                 ADAMHandle = ADHandle;
             }
             else
             {
-                ADAMHandle = new LoadLibrarySafeHandle(tempHandle);
+                ADAMHandle = tempHandle;
             }
         }
 

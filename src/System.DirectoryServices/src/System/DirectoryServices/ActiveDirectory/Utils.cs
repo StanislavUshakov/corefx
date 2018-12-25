@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.Win32.SafeHandles;
 using System.Text;
 using System.Net;
 using System.Collections;
@@ -10,6 +11,7 @@ using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Globalization;
+using CommonInterop = Interop;
 
 namespace System.DirectoryServices.ActiveDirectory
 {
@@ -109,7 +111,7 @@ namespace System.DirectoryServices.ActiveDirectory
             Debug.Assert(distinguishedName != null);
 
             // call DsCrackNamesW
-            IntPtr functionPtr = UnsafeNativeMethods.GetProcAddress(DirectoryContext.ADHandle, "DsCrackNamesW");
+            IntPtr functionPtr = CommonInterop.Kernel32.GetProcAddress(DirectoryContext.ADHandle, "DsCrackNamesW");
             if (functionPtr == (IntPtr)0)
             {
                 throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());
@@ -165,7 +167,7 @@ namespace System.DirectoryServices.ActiveDirectory
                     if (results != IntPtr.Zero)
                     {
                         // call DsFreeNameResultW
-                        functionPtr = UnsafeNativeMethods.GetProcAddress(DirectoryContext.ADHandle, "DsFreeNameResultW");
+                        functionPtr = CommonInterop.Kernel32.GetProcAddress(DirectoryContext.ADHandle, "DsFreeNameResultW");
                         if (functionPtr == (IntPtr)0)
                         {
                             throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());
@@ -197,7 +199,7 @@ namespace System.DirectoryServices.ActiveDirectory
             Debug.Assert(dnsName != null);
 
             // call DsCrackNamesW
-            IntPtr functionPtr = UnsafeNativeMethods.GetProcAddress(DirectoryContext.ADHandle, "DsCrackNamesW");
+            IntPtr functionPtr = CommonInterop.Kernel32.GetProcAddress(DirectoryContext.ADHandle, "DsCrackNamesW");
             if (functionPtr == (IntPtr)0)
             {
                 throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());
@@ -233,7 +235,7 @@ namespace System.DirectoryServices.ActiveDirectory
                     if (results != IntPtr.Zero)
                     {
                         // call DsFreeNameResultW
-                        functionPtr = UnsafeNativeMethods.GetProcAddress(DirectoryContext.ADHandle, "DsFreeNameResultW");
+                        functionPtr = CommonInterop.Kernel32.GetProcAddress(DirectoryContext.ADHandle, "DsFreeNameResultW");
                         if (functionPtr == (IntPtr)0)
                         {
                             throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());
@@ -608,7 +610,7 @@ namespace System.DirectoryServices.ActiveDirectory
             }
         }
 
-        internal static IntPtr GetAuthIdentity(DirectoryContext context, LoadLibrarySafeHandle libHandle)
+        internal static IntPtr GetAuthIdentity(DirectoryContext context, SafeLibraryHandle libHandle)
         {
             IntPtr authIdentity;
             int result = 0;
@@ -621,7 +623,7 @@ namespace System.DirectoryServices.ActiveDirectory
 
             // create the credentials 
             // call DsMakePasswordCredentialsW
-            IntPtr functionPtr = UnsafeNativeMethods.GetProcAddress(libHandle, "DsMakePasswordCredentialsW");
+            IntPtr functionPtr = CommonInterop.Kernel32.GetProcAddress(libHandle, "DsMakePasswordCredentialsW");
             if (functionPtr == (IntPtr)0)
             {
                 throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());
@@ -640,13 +642,13 @@ namespace System.DirectoryServices.ActiveDirectory
             return authIdentity;
         }
 
-        internal static void FreeAuthIdentity(IntPtr authIdentity, LoadLibrarySafeHandle libHandle)
+        internal static void FreeAuthIdentity(IntPtr authIdentity, SafeLibraryHandle libHandle)
         {
             // free the credentials object
             if (authIdentity != IntPtr.Zero)
             {
                 // call DsMakePasswordCredentialsW
-                IntPtr functionPtr = UnsafeNativeMethods.GetProcAddress(libHandle, "DsFreePasswordCredentials");
+                IntPtr functionPtr = CommonInterop.Kernel32.GetProcAddress(libHandle, "DsFreePasswordCredentials");
                 if (functionPtr == (IntPtr)0)
                 {
                     throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());
@@ -656,14 +658,14 @@ namespace System.DirectoryServices.ActiveDirectory
             }
         }
 
-        internal static IntPtr GetDSHandle(string domainControllerName, string domainName, IntPtr authIdentity, LoadLibrarySafeHandle libHandle)
+        internal static IntPtr GetDSHandle(string domainControllerName, string domainName, IntPtr authIdentity, SafeLibraryHandle libHandle)
         {
             int result = 0;
             IntPtr handle;
 
             // call DsBindWithCred
             Debug.Assert((domainControllerName != null && domainName == null) || (domainName != null && domainControllerName == null));
-            IntPtr functionPtr = UnsafeNativeMethods.GetProcAddress(libHandle, "DsBindWithCredW");
+            IntPtr functionPtr = CommonInterop.Kernel32.GetProcAddress(libHandle, "DsBindWithCredW");
             if (functionPtr == (IntPtr)0)
             {
                 throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());
@@ -678,13 +680,13 @@ namespace System.DirectoryServices.ActiveDirectory
             return handle;
         }
 
-        internal static void FreeDSHandle(IntPtr dsHandle, LoadLibrarySafeHandle libHandle)
+        internal static void FreeDSHandle(IntPtr dsHandle, SafeLibraryHandle libHandle)
         {
             // DsUnbind
             if (dsHandle != IntPtr.Zero)
             {
                 // call DsUnbind
-                IntPtr functionPtr = UnsafeNativeMethods.GetProcAddress(libHandle, "DsUnBindW");
+                IntPtr functionPtr = CommonInterop.Kernel32.GetProcAddress(libHandle, "DsUnBindW");
                 if (functionPtr == (IntPtr)0)
                 {
                     throw ExceptionHelper.GetExceptionFromErrorCode(Marshal.GetLastWin32Error());

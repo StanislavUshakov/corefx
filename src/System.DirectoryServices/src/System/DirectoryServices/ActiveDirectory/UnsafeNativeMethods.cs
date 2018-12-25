@@ -734,15 +734,6 @@ namespace System.DirectoryServices.ActiveDirectory
         [DllImport("ntdll.dll", EntryPoint = "RtlInitUnicodeString")]
         public static extern int RtlInitUnicodeString(LSA_UNICODE_STRING result, IntPtr s);
 
-        [DllImport("Kernel32.dll", EntryPoint = "LoadLibraryW", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern IntPtr LoadLibrary(string name);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        public extern static uint FreeLibrary(IntPtr libName);
-
-        [DllImport("kernel32.dll", EntryPoint = "GetProcAddress", SetLastError = true, BestFitMapping = false)]
-        public extern static IntPtr GetProcAddress(LoadLibrarySafeHandle hModule, string entryPoint);
-
         /*
         DWORD DsRoleGetPrimaryDomainInformation(
           LPCWSTR lpServer,
